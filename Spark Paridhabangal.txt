@@ -1,0 +1,28 @@
+My learnings with respect to Spark:
+
+Environment Used :
+
+1) Cloudera CDH quickstart VM with spark 1.6 prebuilt with hadoop 2.6 binaries , with java 1.7 virtual machine
+
+Environment Changes Made:
+
+1) Upgraded JVM from 1.7 to 1.8 
+2) Downloaded Scala 2.11.8
+3) Downloaded Spark 2.1.0 compatible with hadoop-2.6 
+
+Running Spark :
+1) Stopped 1.6 cloudera's spark .
+2) Important note : Set SPARK_HOME whenever u run , because it might point to different versions
+
+
+Findings/learnings :
+
+Spark uses spark-defaults.conf and spark-env.sh and log4j.properties from SPARK_HOME/conf
+
+HADOOP_CONF_DIR is a must , dont forget to configure it.
+
+Use spark.driver.extraLibraryPath and spark.executor.extraLibraryPath to add jars to driver and executor in spark-defaults.conf
+
+You can dynamically add jars to sparkcontext with the method SparkContext.addJar() method but it has to be mentioned as part of --jars option in spark-submit (Took so much time to find it)
+
+Above point applies for Spark standalone cluster as well as yarn-cluster mode.
