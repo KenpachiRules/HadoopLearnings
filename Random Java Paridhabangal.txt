@@ -1,0 +1,49 @@
+/// This short tutorial is about building jars from class files
+/// copying the method which creates jar from files.
+/// Good utility method to create jar out of class files.
+
+  public static void createJar(String jarFileFullPath, String tgtDir) throws IOException {
+        Path jar = new File(jarFileFullPath).toPath();
+        final Path root = new File(tgtDir).toPath();
+        String name = "mainCode";
+        String fingerprint = "mySparkCode";
+        
+        // TODO: Log the steps where required
+
+        Manifest manifest = new Manifest();
+        Attributes attributes = manifest.getMainAttributes();
+        attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
+        attributes.put(Attributes.Name.SPECIFICATION_TITLE, name);
+        attributes.put(Attributes.Name.SPECIFICATION_VERSION, "1.0");
+        attributes.put(Attributes.Name.SPECIFICATION_VENDOR, "Informatica");
+        attributes.put(Attributes.Name.IMPLEMENTATION_TITLE, fingerprint);
+        attributes.put(Attributes.Name.IMPLEMENTATION_VERSION, "1.0");
+        attributes.put(Attributes.Name.IMPLEMENTATION_VENDOR, "Informatica");
+        try (FileOutputStream fos = new FileOutputStream(jar.toFile());
+            JarOutputStream jos = new JarOutputStream(fos, manifest);) {
+            final byte[] buf = new byte[65536];
+            FileVisitor<Path> visitor = new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                    throws IOException {
+                    Path path = root.relativize(file);
+                    String name = path.toString().replace(File.separatorChar, '/');
+                    if (file.toFile().isDirectory()) {
+                        ZipEntry entry = new ZipEntry(name + "/");
+                        jos.putNextEntry(entry);
+                    } else {
+                        ZipEntry entry = new ZipEntry(name);
+                        jos.putNextEntry(entry);
+                        try (FileInputStream fis = new FileInputStream(file.toFile());) {
+                            for (int len; (len = fis.read(buf)) > 0;) {
+                                jos.write(buf, 0, len);
+                            }
+                        }
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            };
+            Files.walkFileTree(root, visitor);
+        }
+    }
+    
