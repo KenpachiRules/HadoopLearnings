@@ -1,0 +1,1 @@
+spark-submit --verbose  --class com.hari.spark.kafka.struct.streaming.ReadWriteKafka --master yarn --deploy-mode cluster --name ReadWriteBankai --jars $(echo dependency/*.jar | tr ' ' ',')  KafkaStructStreamignYarn-0.0.1-SNAPSHOT.jar
